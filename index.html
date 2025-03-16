@@ -160,6 +160,9 @@
             player1Button.style.backgroundColor = "lightblue";
             player2Button.style.backgroundColor = "lightcoral";
 
+            player1Button.disabled = false;  // Habilita os botões
+            player2Button.disabled = false;
+
             randomTime = Math.floor(Math.random() * (25000 - 5000 + 1)) + 5000;
 
             setTimeout(() => {
@@ -178,6 +181,8 @@
             `;
             winnerMessage.style.display = "block";
             indicator.style.display = "none"; // Garante que a interação amarela desapareça
+            player1Button.disabled = true; // Desabilita os botões
+            player2Button.disabled = true; // Desabilita os botões
         }
 
         player1Button.addEventListener("click", () => {
