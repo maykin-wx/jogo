@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Torta na Cara</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container input {
+            width: 80%;
+            padding: 10px;
+            font-size: 18px;
+            margin: 10px 5px;
+            text-align: center;
+        }
+        .container button {
+            width: 50%;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .game-screen {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+        }
+        .buttons button {
+            width: 100%;
+            height: 50%;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #player1 {
+            background-color: lightblue;
+            color: white;
+            transform: rotate(180deg); /* Inverte o texto do jogador 1 */
+        }
+        #player2 {
+            background-color: lightcoral;
+            color: white;
+        }
+        .indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: yellow;
+            animation: pulse 1s infinite alternate;
+            z-index: 1;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.5); }
+        }
+        .winner-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            background-color: white;
+            padding: 30px 40px; /* Aumenta a largura da mensagem */
+            border-radius: 10px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+            width: 80%; /* Ajusta a largura da janela de mensagem */
+            max-width: 500px; /* Limita a largura máxima */
+        }
+        .winner-message h2 {
+            margin: 0;
+            color: red;
+        }
+        .winner-message p {
+            margin: 10px 0;
+        }
+        .winner-message button {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: green;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="startScreen">
+        <h1>Jogo Torta na Cara</h1>
+        <input type="text" id="player1Name" placeholder="Nome do Jogador 1">
+        <input type="text" id="player2Name" placeholder="Nome do Jogador 2">
+        <button id="start">Iniciar Jogo</button>
+    </div>
+
+    <div class="game-screen" id="gameScreen">
+        <div class="indicator" id="indicator"></div>
+        <div class="buttons">
+            <button id="player1"></button>
+            <button id="player2"></button>
+        </div>
+        <div class="winner-message" id="winnerMessage"></div>
+    </div>
+
+    <script>
+        const startButton = document.getElementById("start");
+        const startScreen = document.getElementById("startScreen");
+        const gameScreen = document.getElementById("gameScreen");
+        const player1Button = document.getElementById("player1");
+        const player2Button = document.getElementById("player2");
+        const indicator = document.getElementById("indicator");
+        const winnerMessage = document.getElementById("winnerMessage");
+
+        let gameActive = false;
+        let randomTime;
+        let player1Name, player2Name;
+
+        startButton.addEventListener("click", () => {
+            player1Name = document.getElementById("player1Name").value || "Jogador 1";
+            player2Name = document.getElementById("player2Name").value || "Jogador 2";
+            player1Button.textContent = player1Name;
+            player2Button.textContent = player2Name;
+            startScreen.style.display = "none";
+            gameScreen.style.display = "block";
+            startRound();
+        });
+
+        function startRound() {
+            gameActive = false;
+            indicator.style.display = "block";
+            winnerMessage.style.display = "none";
+
+            player1Button.style.backgroundColor = "lightblue";
+            player2Button.style.backgroundColor = "lightcoral";
+
+            randomTime = Math.floor(Math.random() * (25000 - 5000 + 1)) + 5000;
+
+            setTimeout(() => {
+                gameActive = true;
+                indicator.style.display = "none";
+                player1Button.style.backgroundColor = "blue";
+                player2Button.style.backgroundColor = "red";
+            }, randomTime);
+        }
+
+        function declareWinner(loser, winner, msg) {
+            winnerMessage.innerHTML = `
+                <h2>${loser} perdeu!</h2>
+                <p>${msg}</p>
+                <button onclick="startRound()">Começar de Novo</button>
+            `;
+            winnerMessage.style.display = "block";
+            indicator.style.display = "none"; // Garante que a interação amarela desapareça
+        }
+
+        player1Button.addEventListener("click", () => {
+            if (!gameActive) {
+                declareWinner(player1Name, player2Name, `${player1Name} apertou antes da hora. ${player2Name} venceu!`);
+            } else {
+                declareWinner(player2Name, player1Name, `${player1Name} apertou primeiro. ${player2Name} perdeu!`);
+            }
+        });
+
+        player2Button.addEventListener("click", () => {
+            if (!gameActive) {
+                declareWinner(player2Name, player1Name, `${player2Name} apertou antes da hora. ${player1Name} venceu!`);
+            } else {
+                declareWinner(player1Name, player2Name, `${player2Name} apertou primeiro. ${player1Name} perdeu!`);
+            }
+        });
+    </script>
+</body>
+</html>
